@@ -1,0 +1,33 @@
+# Teaching examples are local references, not project source.
+/example/
+
+# Reproducible training outputs and model artifacts.
+/outputs/
+/logs/
+/runs/
+/wandb/
+*.keras
+*.h5
+*.pt
+*.pth
+*.onnx
+model.png
+
+# Jupyter and Python caches.
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+*.so
+
+# Local Python environments and secrets.
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Operating-system and editor files.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

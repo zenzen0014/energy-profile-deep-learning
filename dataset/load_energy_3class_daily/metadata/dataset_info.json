@@ -1,0 +1,39 @@
+{
+  "source": "dataset/raw_building_csv/{normal,abnormal}/*_energy.csv",
+  "source_measure": "Electricity",
+  "source_unit": "not specified in source CSV",
+  "date_start": "2019-07-01",
+  "date_end": "2020-06-30",
+  "sample_grain": "one building and one complete 24-hour day",
+  "calibration_days_per_building": 30,
+  "calibration_excluded_from_samples": true,
+  "class_map": {
+    "0": "low activity",
+    "1": "typical",
+    "2": "peak dominant"
+  },
+  "label_priority": [
+    "low activity",
+    "peak dominant",
+    "typical"
+  ],
+  "low_activity_rule": "activity_ratio < 0.65",
+  "peak_dominant_rule": "activity_ratio >= 0.65 and peak_factor >= 1.6",
+  "typical_rule": "otherwise",
+  "pearson_24h": "Pearson correlation of sample and 30-day median reference across 24 hourly pairs; 0 if constant",
+  "label_status": "rule-derived provisional labels; no expert validation",
+  "sample_count": 6720,
+  "building_count": 20,
+  "class_counts": {
+    "low activity": 967,
+    "typical": 4709,
+    "peak dominant": 1044
+  },
+  "excluded_invalid_days": 0,
+  "image_count": 6720,
+  "image_method": "Ledoit-Wolf shrunk covariance converted to Pearson correlation of 24 hourly columns across 7 consecutive days ending on sample date, then ReLU",
+  "image_window_days": 7,
+  "image_stride_days": 1,
+  "image_encoding": "24x24 RGBA PNG: correlation <=0 green (0,127,102,255), correlation 1 yellow (255,255,102,255)",
+  "windows_with_constant_hours": 95
+}
