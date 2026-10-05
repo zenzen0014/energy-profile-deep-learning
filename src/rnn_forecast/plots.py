@@ -34,6 +34,27 @@ def plot_learning_curves(history, save_path):
     return fig
 
 
+def plot_three_dataset_samples(building_rows, hourly, save_path):
+    """Show three labeled daily load profiles from evenly spaced buildings."""
+    building_ids = sorted(building_rows)
+    if len(building_ids) < 3:
+        raise ValueError("At least three buildings are required")
+    selected = np.linspace(0, len(building_ids) - 1, num=3, dtype=int)
+    fig, axes = plt.subplots(1, 3, figsize=(13, 3.5), sharey=True)
+    for number, (axis, index) in enumerate(zip(axes, selected), start=1):
+        row = building_rows[building_ids[index]][len(building_rows[building_ids[index]]) // 2]
+        axis.plot(range(24), hourly[row["sample_id"]], color="tab:blue", marker="o", markersize=3)
+        axis.set(title=f"Sample {number}: {row['building_id']} | {row['date']}",
+                 xlabel="Hour", xlim=(0, 23))
+        axis.set_xticks((0, 6, 12, 18, 23))
+        axis.grid(alpha=0.25)
+    axes[0].set_ylabel("Electricity")
+    fig.suptitle("Simple dataset representation: 3 daily load profiles", y=1.03)
+    fig.tight_layout()
+    _save(fig, save_path)
+    return fig
+
+
 def plot_forecast_examples(sequences, hourly, actual, predicted, save_path, n_examples=3,
                            selection="even"):
     """Show the previous day beside actual, forecast, and hourly error."""

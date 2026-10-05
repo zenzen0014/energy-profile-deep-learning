@@ -67,6 +67,26 @@ def plot_confusion_matrix(matrix, save_path):
     return fig
 
 
+def plot_prediction_probabilities(probabilities, predicted_class, save_path):
+    """Plot the class probabilities for one prediction and save the bar chart."""
+    probabilities = np.asarray(probabilities, dtype=float)
+    if probabilities.shape != (len(CLASS_NAMES),):
+        raise ValueError(f"probabilities must have shape ({len(CLASS_NAMES)},)")
+
+    colors = ["tab:orange" if class_id == predicted_class else "tab:blue"
+              for class_id in range(len(CLASS_NAMES))]
+    fig, ax = plt.subplots(figsize=(7, 4))
+    bars = ax.bar(CLASS_NAMES, probabilities, color=colors)
+    ax.set(title="Prediction probabilities", ylabel="Probability", ylim=(0, 1.05))
+    ax.grid(axis="y", alpha=0.2)
+    for bar, probability in zip(bars, probabilities):
+        ax.text(bar.get_x() + bar.get_width() / 2, probability + 0.02, f"{probability:.3f}",
+                ha="center", va="bottom")
+    fig.tight_layout()
+    _save(fig, save_path)
+    return fig
+
+
 def plot_test_examples(rows, predicted, data_dir, save_path, n_examples=6):
     """Show requested test images, prioritizing correct and mistaken cases per class."""
     if n_examples < 1:

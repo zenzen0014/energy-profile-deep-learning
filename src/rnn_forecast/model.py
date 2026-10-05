@@ -27,6 +27,8 @@ class LoadProfileGRU(nn.Module):
         return self.head(encoded[:, -1, :])
 
 
+
+
 class ResidualLoadProfileGRU(LoadProfileGRU):
     """Forecast a correction to recent-day and same-weekday profiles."""
 
