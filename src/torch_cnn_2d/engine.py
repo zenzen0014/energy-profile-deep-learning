@@ -30,6 +30,7 @@ def evaluate(model, loader, criterion, device, decision_bias=None):
     """Evaluate one loader; rows stay aligned with a non-shuffled loader."""
     model.eval()
     total_loss, batch_losses, actual, predicted = 0.0, [], [], []
+
     with torch.no_grad():
         for xb, yb in loader:
             xb, yb = xb.to(device), yb.to(device)
@@ -37,10 +38,13 @@ def evaluate(model, loader, criterion, device, decision_bias=None):
             batch_loss = criterion(logits, yb).item()
             total_loss += batch_loss * len(xb)
             batch_losses.append(batch_loss)
+
             if decision_bias is not None:
                 logits = logits + torch.as_tensor(decision_bias, dtype=logits.dtype, device=device)
+
             actual.extend(yb.cpu().tolist())
             predicted.extend(logits.argmax(1).cpu().tolist())
+            
     matrix = confusion_matrix(actual, predicted)
     return {
         "loss": total_loss / len(loader.dataset),
@@ -56,9 +60,11 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, device,
     """Train with early stopping on validation macro-F1."""
     history = []
     best_f1, best_state, best_epoch, no_improvement = -1.0, None, 0, 0
+
     for epoch in range(1, max_epochs + 1):
         model.train()
         train_loss_sum, batch_losses, actual, predicted = 0.0, [], [], []
+
         for xb, yb in train_loader:
             xb, yb = xb.to(device), yb.to(device)
             optimizer.zero_grad()
@@ -66,6 +72,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, device,
             loss = criterion(logits, yb)
             loss.backward()
             optimizer.step()
+
             train_loss_sum += loss.item() * len(xb)
             batch_losses.append(loss.item())
             actual.extend(yb.cpu().tolist())
@@ -75,6 +82,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, device,
         validation = evaluate(model, val_loader, criterion, device)
         train_f1 = float(per_class_scores(train_matrix)[2].mean())
         val_f1 = float(per_class_scores(validation["matrix"])[2].mean())
+
         history.append({
             "epoch": epoch,
             "train_loss": train_loss_sum / len(train_loader.dataset),
@@ -88,14 +96,17 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, device,
         })
         print(f"Epoch {epoch:02d} | train loss {history[-1]['train_loss']:.4f} | "
               f"val loss {validation['loss']:.4f} | val macro-F1 {val_f1:.3f}")
+        
         if val_f1 > best_f1 + 1e-4:
             best_f1, best_epoch, no_improvement = val_f1, epoch, 0
             best_state = copy.deepcopy(model.state_dict())
         else:
             no_improvement += 1
+
         if no_improvement >= patience:
             print("Early stopping at epoch", epoch)
             break
+
     model.load_state_dict(best_state)
     return history, best_epoch, best_f1
 
