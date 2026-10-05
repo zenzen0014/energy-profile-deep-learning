@@ -1,5 +1,6 @@
 numpy
 Pillow
 matplotlib
+graphviz
 torch
 visualtorch==1.4.1
