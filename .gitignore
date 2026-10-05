@@ -14,6 +14,8 @@
 model.png
 
 # Jupyter and Python caches.
+*.ipynb
+!sample_torch.ipynb
 .ipynb_checkpoints/
 __pycache__/
 *.py[cod]
