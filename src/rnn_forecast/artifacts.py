@@ -15,6 +15,8 @@ def save_run(output_dir, model, history, metrics, splits, normalization, seed, b
     torch.save({
         "model_state_dict": {key: value.cpu() for key, value in model.state_dict().items()},
         "architecture": type(model).__name__,
+        "recent_weight": getattr(model, "recent_weight", None),
+        "seasonal_lag": getattr(model, "seasonal_lag", None),
         "input_shape": [lookback_days, 24],
         "forecast_horizon_hours": 24,
         "normalization": normalization,
@@ -44,6 +46,8 @@ def save_run(output_dir, model, history, metrics, splits, normalization, seed, b
         "seed": int(seed),
         "lookback_days": int(lookback_days),
         "forecast_horizon_hours": 24,
+        "recent_weight": getattr(model, "recent_weight", None),
+        "seasonal_lag": getattr(model, "seasonal_lag", None),
         "normalization": normalization,
         "split_unit": "chronological_target_date_per_building",
         "train_count": len(train_sequences),

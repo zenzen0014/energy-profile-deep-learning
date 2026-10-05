@@ -81,3 +81,17 @@ def summarize_test(result):
         "test_rmse": float(result["rmse"]),
         "test_wape_percent": float(result["wape"]),
     }
+
+
+def summarize_baselines(dataset, actual, recent_weight=0.8, seasonal_lag=7):
+    """Compare the forecast with recent-day and seasonal-blend references."""
+    inputs = dataset.inputs.numpy()
+    recent = inverse_normalize(inputs[:, -1, :], dataset.normalization)
+    blend = inverse_normalize(
+        recent_weight * inputs[:, -1, :] + (1 - recent_weight) * inputs[:, -seasonal_lag, :],
+        dataset.normalization,
+    )
+    return {
+        "previous_day_mae": float(np.abs(recent - actual).mean()),
+        "seasonal_blend_mae": float(np.abs(blend - actual).mean()),
+    }
