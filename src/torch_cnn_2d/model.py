@@ -8,12 +8,12 @@ class SmallLoadProfileCNN(nn.Module):
         super().__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 16, 3, padding=1), 
-            nn.BatchNorm2d(16), 
+            # nn.BatchNorm2d(16), 
             nn.ReLU(), 
             nn.MaxPool2d(2),
 
             nn.Conv2d(16, 32, 3, padding=1), 
-            nn.BatchNorm2d(32), 
+            # nn.BatchNorm2d(32), 
             nn.ReLU(), 
             nn.MaxPool2d(2),
             
@@ -43,13 +43,13 @@ class SmallLoadProfileCNNDepthwise(nn.Module):
             # Depthwise 3x3 spatial filtering followed by 1x1 channel mixing.
             nn.Conv2d(3, 3, 3, padding=1, groups=3, bias=False),
             nn.Conv2d(3, 16, 1, bias=False),
-            nn.BatchNorm2d(16), 
+            # nn.BatchNorm2d(16), 
             nn.ReLU(), 
             nn.MaxPool2d(2),
 
             nn.Conv2d(16, 16, 3, padding=1, groups=16, bias=False),
             nn.Conv2d(16, 32, 1, bias=False),
-            nn.BatchNorm2d(32), 
+            # nn.BatchNorm2d(32), 
             nn.ReLU(), 
             nn.MaxPool2d(2),
             
