@@ -22,12 +22,21 @@ class SmallLoadProfileCNN(nn.Module):
             # nn.ReLU(), 
             # nn.MaxPool2d(2),
         )
+        # self.classifier = nn.Sequential(
+        #     nn.Flatten(), 
+        #     nn.Linear(32 * 6 * 6, 64), 
+        #     nn.ReLU(), 
+        #     nn.Dropout(0.3), 
+        #     nn.Linear(64, 3)
+        # )
+
         self.classifier = nn.Sequential(
-            nn.Flatten(), 
-            nn.Linear(32 * 6 * 6, 64), 
-            nn.ReLU(), 
-            nn.Dropout(0.3), 
-            nn.Linear(64, 3)
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(32, 16),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(16, 3),
         )
 
     def forward(self, x):
@@ -58,13 +67,30 @@ class SmallLoadProfileCNNDepthwise(nn.Module):
             # nn.ReLU(), 
             # nn.MaxPool2d(2),
         )
+
         self.classifier = nn.Sequential(
-            nn.Flatten(), 
-            nn.Linear(32 * 6 * 6, 64), 
-            nn.ReLU(), 
-            nn.Dropout(0.3), 
-            nn.Linear(64, 3)
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(32, 16),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(16, 3),
         )
+
+        ## Less Accurate but Faster
+        # self.classifier = nn.Sequential(
+        #     nn.AdaptiveAvgPool2d((1, 1)), 
+        #     nn.Flatten(), 
+        #     nn.Linear(32, 3),
+        # )
+        
+        # self.classifier = nn.Sequential(
+        #     nn.Flatten(), 
+        #     nn.Linear(32 * 6 * 6, 64), 
+        #     nn.ReLU(), 
+        #     nn.Dropout(0.3), 
+        #     nn.Linear(64, 3)
+        # )
 
     def forward(self, x):
         return self.classifier(self.features(x))

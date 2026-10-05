@@ -67,8 +67,14 @@ def plot_confusion_matrix(matrix, save_path):
     return fig
 
 
-def plot_test_examples(rows, predicted, data_dir, save_path):
-    """Show one correct and one mistaken test image per actual class when possible."""
+def plot_test_examples(rows, predicted, data_dir, save_path, n_examples=6):
+    """Show requested test images, prioritizing correct and mistaken cases per class."""
+    if n_examples < 1:
+        raise ValueError("n_examples must be at least 1")
+    if not rows:
+        raise ValueError("rows must contain at least one test example")
+    n_examples = min(n_examples, len(rows))
+
     selected = []
     for class_id in range(3):
         indices = [i for i, row in enumerate(rows) if int(row["class_id"]) == class_id]
@@ -77,7 +83,14 @@ def plot_test_examples(rows, predicted, data_dir, save_path):
         examples = [index for index in (correct, mistake) if index is not None]
         examples.extend(index for index in indices if index not in examples)
         selected.extend(examples[:2])
-    fig, axes = plt.subplots(2, 3, figsize=(10, 7))
+
+    # Complete the requested count after the representative per-class examples.
+    selected.extend(index for index in range(len(rows)) if index not in selected)
+    selected = selected[:n_examples]
+
+    n_cols = 2
+    n_rows = int(np.ceil(n_examples / n_cols))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(8, 3.5 * n_rows), squeeze=False)
     for ax, index in zip(axes.flat, selected):
         row = rows[index]
         with Image.open(Path(data_dir) / row["image_path"]) as image:

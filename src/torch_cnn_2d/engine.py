@@ -44,7 +44,7 @@ def evaluate(model, loader, criterion, device, decision_bias=None):
 
             actual.extend(yb.cpu().tolist())
             predicted.extend(logits.argmax(1).cpu().tolist())
-            
+
     matrix = confusion_matrix(actual, predicted)
     return {
         "loss": total_loss / len(loader.dataset),
@@ -150,6 +150,33 @@ def summarize_test(result, train_rows):
             for i, name in enumerate(CLASS_NAMES)
         },
     }
+
+
+def print_training_summary(best_epoch, best_val_f1, calibrated_val_f1, decision_bias):
+    """Print the final validation and decision-bias summary."""
+    print(f"Best epoch: {best_epoch}")
+    print(f"Validation macro-F1: {best_val_f1:.3f}")
+    print(f"Calibrated validation macro-F1: {calibrated_val_f1:.3f}")
+    print(f"Peak-class bias: {decision_bias[2]:.3f}")
+
+
+def print_test_summary(metrics, test_rows, predicted):
+    """Print aggregate, per-class, and representative prediction results."""
+    print(f"Test loss: {metrics['test_loss']:.4f}")
+    print(f"Test accuracy: {metrics['test_accuracy']:.3f}")
+    print(f"Test macro-F1: {metrics['test_macro_f1']:.3f}")
+    print(f"Majority-class baseline macro-F1: {metrics['majority_baseline_macro_f1']:.3f}")
+    print("\nPer-class scores:")
+    for name in CLASS_NAMES:
+        score = metrics["per_class"][name]
+        print(f"{name:14s} precision={score['precision']:.3f} "
+              f"recall={score['recall']:.3f} F1={score['f1']:.3f} n={score['support']}")
+
+    print("\nPrediction examples:")
+    for class_id in range(len(CLASS_NAMES)):
+        index = next(i for i, row in enumerate(test_rows) if int(row["class_id"]) == class_id)
+        print(test_rows[index]["sample_id"], "| actual:", CLASS_NAMES[class_id],
+              "| predicted:", CLASS_NAMES[int(predicted[index])])
 
 
 def predict_one(model, dataset, index, device, decision_bias=None):
